@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Library</string>
+    <string name="welcome_to_books_exchange">Welcome to \nbooks Exchange</string>
+    <string name="channel_name">borrow_channel</string>
+    <string name="channel_description">borrow request and reply</string>
+    <string name="pick_image_intent_text">Select image</string>
+</resources>

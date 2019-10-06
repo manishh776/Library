@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.SplashActivity"
+    android:background="@color/back"
+    >
+
+    <LinearLayout
+        android:id="@+id/splash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textColor="#ffffff"
+        android:gravity="center_horizontal"
+        android:text="@string/welcome_to_books_exchange"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="23dp"
+        />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_books"
+            android:layout_gravity="center_horizontal"
+            />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="54dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginEnd="13dp"
+        android:layout_below="@+id/splash"
+        >
+
+        <EditText
+            android:id="@+id/phoneemail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_back"
+            android:hint="Your phone number or email"
+            android:textColorHint="@color/hintcolor"
+            android:textColor="@color/white"
+            />
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_back"
+            android:hint="Password"
+            android:textColorHint="@color/hintcolor"
+            android:layout_marginTop="20dp"
+            android:textColor="@color/white"
+            android:inputType="textPassword"
+            />
+
+        <Button
+            android:id="@+id/loginBtn"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:text="Login"
+            android:textAllCaps="false"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/button_back"
+            android:textColor="@color/white"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginTop="20dp"
+            android:visibility="gone"
+            />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:visibility="gone"
+            >
+
+        <TextView
+            android:id="@+id/forgotpass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Forgot your password?"
+            android:textColor="@color/white"
+            />
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:background="@color/white"
+                android:layout_below="@+id/forgotpass"
+                android:layout_alignStart="@+id/forgotpass"
+                android:layout_alignEnd="@+id/forgotpass"
+                />
+
+
+        </RelativeLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray"
+            android:layout_marginTop="10dp"
+            />
+
+        <RelativeLayout
+            android:id="@+id/noaccount"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:paddingBottom="20dp"
+            >
+
+            <TextView
+                android:id="@+id/signup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Don&apos;t Have an Account?"
+                android:textColor="@color/white"
+                android:layout_alignParentBottom="true"
+                />
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:background="@color/white"
+                android:layout_above="@+id/signup"
+                android:layout_alignStart="@+id/signup"
+                android:layout_alignEnd="@+id/signup"
+                android:layout_alignParentBottom="true"
+                />
+
+
+        </RelativeLayout>
+
+
+
+    </LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+</RelativeLayout>
