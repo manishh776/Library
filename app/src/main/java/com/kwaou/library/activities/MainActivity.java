@@ -28,6 +28,7 @@ import com.google.gson.Gson;
 import com.kwaou.library.R;
 import com.kwaou.library.adapters.BookAdapter;
 import com.kwaou.library.fragments.BooksFragment;
+import com.kwaou.library.fragments.CategoryFragment;
 import com.kwaou.library.fragments.NotificationFragment;
 import com.kwaou.library.fragments.ProfileFragment;
 import com.kwaou.library.helper.Config;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView imageViewAdd;
     private int lastSelected = -1;
     public static NonSwipingViewPager viewPager;
+    private int login_state;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,22 +77,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imageViewAdd = findViewById(R.id.add_book);
         viewPager = findViewById(R.id.viewpager);
 
-        textViewLogout.setOnClickListener(this);
         textViewbooks.setOnClickListener(this);
-        textViewNotifications.setOnClickListener(this);
         textViewprofile.setOnClickListener(this);
-        imageViewAdd.setOnClickListener(this);
+        login_state = Integer.parseInt(KeyValueDb.get(this, Config.LOGIN_STATE,"0"));
+        if(login_state == 1){
+            textViewLogout.setAlpha(1f);
+            textViewNotifications.setAlpha(1f);
+            imageViewAdd.setAlpha(1f);
+            imageViewAdd.setOnClickListener(this);
+            textViewLogout.setOnClickListener(this);
+            textViewNotifications.setOnClickListener(this);
+        }else{
+            textViewLogout.setAlpha(0.4f);
+            textViewNotifications.setAlpha(0.4f);
+            imageViewAdd.setAlpha(0.4f);
+        }
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
-
         viewPager.setCurrentItem(0);
         textViewbooks.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(R.drawable.ic_books_stack_of_three_orange),null,null);
         updateLastSelected();
         lastSelected = 0;
-
-
-
     }
 
     @Override
@@ -163,10 +171,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Fragment fragment = null;
 
             switch (i){
-
                 case 0:
                     Log.d(TAG,"" + i);
-                    fragment = new BooksFragment();
+                    fragment = new CategoryFragment();
                     break;
 
                 case 1:
@@ -203,114 +210,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.e(TAG, "onActivityResult");
-        if(requestCode == BookAdapter.PICK_BOOK_REQUEST_CODE ) {
-            if (resultCode == RESULT_OK) {
-                BookPackage old = (BookPackage) data.getSerializableExtra("old");
-                BookPackage newbook = (BookPackage) data.getSerializableExtra("new");
-
-                Log.d(TAG, "old" + old.getBookArrayList().get(0).getTitle());
-                Log.d(TAG, "new" + newbook.getBookArrayList().get(0).getTitle());
-                showAlertDialogForExchange(old, newbook);
-            } else {
-                Log.e(TAG, "RESLT NOT Okay");
-            }
-        }else{
-            Log.e(TAG,"result code wrong");
-        }
-    }
-
-    private void showAlertDialogForExchange(final BookPackage old, final BookPackage newbook) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("Send Exchange Request");
-        builder.setMessage("Are you sure you want to exchange your set  of " + old.getBookArrayList().size() + " books with this set of "+
-
-        newbook.getBookArrayList().size() + " books?");
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-                sendExchangeRequest(old, newbook);
-            }
-        });
-
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
-        builder.create().show();
-    }
-
-    private void sendExchangeRequest(final BookPackage old, final BookPackage newbook) {
-        BooksFragment.progressDialog.show();
-
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference(Config.FIREBASE_USERS).child(newbook.getUserid());
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                if(user!=null){
-                    sendPush(user, old, newbook);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void sendPush(final User user, final BookPackage old, final BookPackage newbook) {
-        final Gson gson = new Gson();
-        String userstr = KeyValueDb.get(MainActivity.this, Config.USER,"");
-        final User requester = gson.fromJson(userstr, User.class);
-        Map<String, Object> map = new HashMap<>();
-        map.put("old", old);
-        map.put("new", newbook);
-        map.put("from", requester);
-
-        String booktxt = gson.toJson(map);
-        Log.d(TAG, booktxt);
-        RetrofitClient.getInstance().getApi().sendPush(user.getToken(), booktxt , Config.EXCHANGE_REQUEST)
-                .enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        BooksFragment.progressDialog.dismiss();
-                        saveExchange(old, newbook, requester, user );
-                        Toast.makeText(MainActivity.this, "Request sent", Toast.LENGTH_SHORT).show();
-                        try {
-                            JSONObject obj = new JSONObject(response.body().string());
-                            Log.d(TAG, response.body().string());
-                        } catch (JSONException | IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        BooksFragment.progressDialog.dismiss();
-                        Log.d(TAG, t.getMessage());
-                    }
-                });
-    }
-
-    private void saveExchange(BookPackage old, BookPackage newbook, User requester, User lender) {
-        DatabaseReference dealsRef = FirebaseDatabase.getInstance().getReference(Config.FIREBASE_BOOK_DEALS);
-        String dealid = dealsRef.push().getKey();
-
-        BookDeal bookDeal = new BookDeal(dealid, old, newbook, lender, requester, false,1, getCurrentDate());
-        dealsRef.child(dealid).setValue(bookDeal);
-
-    }
-    public String getCurrentDate(){
-        Date date = new Date();
-        DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(MainActivity.this);
-        return  dateFormat.format(date);
-    }
 }

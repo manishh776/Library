@@ -15,7 +15,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +39,10 @@ import com.kwaou.library.ComplaintActivity;
 import com.kwaou.library.activities.AddBookPackageActivity;
 import com.kwaou.library.activities.AllMyBooksActivity;
 import com.kwaou.library.R;
+import com.kwaou.library.activities.PurchaseActivity;
+import com.kwaou.library.activities.RegisterActivity;
 import com.kwaou.library.activities.RequestActivity;
+import com.kwaou.library.activities.SplashActivity;
 import com.kwaou.library.helper.Config;
 import com.kwaou.library.helper.ImagePicker;
 import com.kwaou.library.models.BookDeal;
@@ -63,6 +68,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     Uri filePathUri;
     String TAG = ProfileFragment.class.getSimpleName();
     TextView name;
+    LinearLayout content, login_buttons;
+    Button register_btn, login_btn;
+    TextView purchases;
 
     @Nullable
     @Override
@@ -78,9 +86,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Please Wait...");
         progressDialog.setCancelable(false);
-
-
-
         name = view.findViewById(R.id.name);
         circleImageView = view.findViewById(R.id.profile_image);
         edit = view.findViewById(R.id.edit);
@@ -91,22 +96,32 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         addnewbooks = view.findViewById(R.id.addnewbook);
         showmybooks = view.findViewById(R.id.showallmybooks);
         requests = view.findViewById(R.id.requests);
-
+        content = view.findViewById(R.id.content);
+        login_buttons = view.findViewById(R.id.login_buttons);
+        purchases = view.findViewById(R.id.purchases);
         edit.setOnClickListener(this);
         addnewbooks.setOnClickListener(this);
         showmybooks.setOnClickListener(this);
         requests.setOnClickListener(this);
         complaints.setOnClickListener(this);
+        purchases.setOnClickListener(this);
 
-        String userstr = KeyValueDb.get(getActivity(), Config.USER,"");
-        Gson gson = new Gson();
-        User user = gson.fromJson(userstr, User.class);
-        name.setText(user.getName());
-        Glide.with(this).load(user.getPicUrl()).placeholder(R.drawable.ic_user).diskCacheStrategy(DiskCacheStrategy.RESOURCE).into(circleImageView);
-
-
-        fetchData();
-
+        int login_state = Integer.parseInt(KeyValueDb.get(getActivity(), Config.LOGIN_STATE, "0"));
+        if(login_state == 1) {
+            String userstr = KeyValueDb.get(getActivity(), Config.USER, "");
+            Gson gson = new Gson();
+            User user = gson.fromJson(userstr, User.class);
+            name.setText(user.getName());
+            Glide.with(this).load(user.getPicUrl()).placeholder(R.drawable.ic_user).diskCacheStrategy(DiskCacheStrategy.RESOURCE).into(circleImageView);
+            fetchData();
+        }else{
+            content.setVisibility(View.GONE);
+            login_buttons.setVisibility(View.VISIBLE);
+            register_btn = view.findViewById(R.id.register_btn);
+            login_btn = view.findViewById(R.id.login_btn);
+            register_btn.setOnClickListener(this);
+            login_btn.setOnClickListener(this);
+        }
     }
 
     private void fetchData() {
@@ -155,7 +170,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 for(DataSnapshot ds: dataSnapshot.getChildren()){
                     BookPackage bookPackage = ds.getValue(BookPackage.class);
                     if(bookPackage!=null && bookPackage.getUserid().equals(userid)){
+                        if(bookPackage.getBookArrayList()!=null)
                         bookscount[0]+=bookPackage.getBookArrayList().size();
+                        else
+                            bookscount[0] = 0;
                     }
                 }
                 mybooks.setText(bookscount[0] + "");
@@ -185,11 +203,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
         else if(view == complaints){
             startActivity(new Intent(getActivity(), ComplaintActivity.class));
+        }else if(view == register_btn){
+            startActivity(new Intent(getActivity(), RegisterActivity.class));
+        }else if(view == login_btn){
+            startActivity(new Intent(getActivity(), SplashActivity.class));
+        } else if (view == purchases) {
+            startActivity(new Intent(getActivity(), PurchaseActivity.class));
         }
     }
 
     private void openGallery() {
         Intent intent = ImagePicker.getPickImageIntent(getActivity());
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivityForResult(intent, PICK_IMAGE);
     }
 

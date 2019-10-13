@@ -20,6 +20,7 @@ public interface Config {
     String EXCHANGE_REQUEST = "exchange-request";
     String EXCHANGE_REQUEST_ACCEPT = "exchangerequestaccept";
     String EXCHANGAE_REQUEST_REJECT = "exchange-requestreject";
+    String PURCHASED_BOOK_RECEIVED = "purchased_book_received";
     String SALE = "sale-request";
     String COMPLAINT = "complaint";
     String COMPLAINT_REPLY = "complaint_reply";

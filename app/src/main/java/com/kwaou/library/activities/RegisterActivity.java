@@ -48,7 +48,6 @@ import java.util.List;
 
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
-
     private static final CharSequence INVALID_DOB_ERROR = "Invalid date of birth";
     private static final CharSequence INVALID_PASS_ERROR = "Invalid password";
     private static final CharSequence INVALID_CPASS_ERROR = "Passwords and Repeat Passwords do not match";
@@ -77,6 +76,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private ArrayList<Book> bookArrayList;
     private int price = 0;
     private String selectedDate = "";
+    private EditText address;
+    private int count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,6 +146,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         categories = findViewById(R.id.categories);
         registerBtn = findViewById(R.id.registerBtn);
         noofBooks = findViewById(R.id.noofbooks);
+        address = findViewById(R.id.address);
 
         registerBtn.setOnClickListener(this);
         uploadBtn.setOnClickListener(this);
@@ -170,21 +172,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void selectDate() {
-
         // Get Current Date
         final Calendar c = Calendar.getInstance();
         int mYear = c.get(Calendar.YEAR);
         int mMonth = c.get(Calendar.MONTH);
         int mDay = c.get(Calendar.DAY_OF_MONTH);
-
-
         DatePickerDialog datePickerDialog = new DatePickerDialog(this,
                 new DatePickerDialog.OnDateSetListener() {
 
                     @Override
                     public void onDateSet(DatePicker view, int year,
                                           int monthOfYear, int dayOfMonth) {
-
                         // TODO Auto-generated method stub
                         Calendar myCalendar = Calendar.getInstance();
                         myCalendar.set(Calendar.YEAR, year);
@@ -238,13 +236,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // TODO Auto-generated method stub
+        super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == PICKBOOK_RESULT_CODE && resultCode == RESULT_OK){
             book = (Book) data.getSerializableExtra("book");
             if(book == null)
                 Toast.makeText(this, "Some error occurred. Please try again.", Toast.LENGTH_SHORT).show();
             else{
-                int count = Integer.parseInt(noofBooks.getText().toString());
+                count = Integer.parseInt(noofBooks.getText().toString());
                 ++count;
                 noofBooks.setText(count + "");
                 price+=book.getPrice();
@@ -257,30 +255,26 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
 
     private void registerUser() {
-
         String namestr = name.getText().toString();
         String mail = email.getText().toString();
         String mobile = phone.getText().toString();
         String password = pass.getText().toString();
-
+        String addresstxt = address.getText().toString();
+        if(count > 0)
         addBookPackage(userid);
-
         String token = KeyValueDb.get(this, Config.USER_TOKEN,"");
-        User user = new User(userid, namestr, mail, mobile, selectedDate, password, "");
+        User user = new User(userid, namestr, mail, mobile, selectedDate, password, "",addresstxt);
         user.setToken(token);
         userRef.child(userid).setValue(user);
-
         Toast.makeText(this, "Registration Successful", Toast.LENGTH_SHORT).show();
         progressDialog.dismiss();
-
         saveAndGotoMainActivity(user);
-
     }
 
     private void addBookPackage(String userid) {
         DatabaseReference packageRef = FirebaseDatabase.getInstance().getReference(Config.FIREBASE_BOOKPACKAGES);
         String id = packageRef.push().getKey();
-        BookPackage bookPackage = new BookPackage(id, userid, bookArrayList, price, 0);
+        BookPackage bookPackage = new BookPackage(id, userid, bookArrayList, price, 0, categoryArrayList.get(CATEGORY_SELECTED));
         packageRef.child(id).setValue(bookPackage);
     }
 
@@ -331,14 +325,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             cpass.setError(INVALID_CPASS_ERROR);
             allOkay = false;
         }
-        if(book == null){
-            Toast.makeText(this, "Please upload a book", Toast.LENGTH_SHORT).show();
+
+        if(address.getText().toString().isEmpty()){
+            address.setError("Can't be empty");
             allOkay = false;
         }
-
-
         return allOkay;
-
     }
 
     private boolean validateDate() {

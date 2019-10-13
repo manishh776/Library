@@ -102,6 +102,27 @@
             android:layout_height="wrap_content"
             android:textSize="10.7sp"
             android:textColor="#ffffff"
+            android:text="Enter your Address:"
+            android:layout_marginTop="10dp"
+            />
+
+        <EditText
+            android:id="@+id/address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_back"
+            android:hint=""
+            android:textColorHint="@color/hintcolor"
+            android:layout_marginTop="7dp"
+            android:textColor="@color/white"
+            />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10.7sp"
+            android:textColor="#ffffff"
             android:text="Enter your Birth Date:"
             android:layout_marginTop="10dp"
             />

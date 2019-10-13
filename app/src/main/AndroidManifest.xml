@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.kwaou.library">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="true"
@@ -11,26 +14,42 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".BooksInPackageActivity"></activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
+
+        <activity android:name=".BooksInPackageActivity"/>
         <activity android:name=".ComplaintActivity" />
         <activity android:name=".AddComplaintActivity" />
         <activity android:name=".activities.AddBookPackageActivity" />
         <activity android:name=".activities.AllMyBooksActivity" />
         <activity android:name=".activities.RequestActivity" />
         <activity android:name=".activities.AddBookActivity" />
+        <activity android:name=".activities.PurchaseActivity"/>
         <activity
             android:name=".activities.RegisterActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize" >
+        </activity>
         <activity android:name=".activities.SplashActivity">
+        </activity>
+        <activity
+            android:name=".activities.MainActivity"
+            android:windowSoftInputMode="adjustNothing" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activities.MainActivity"
-            android:windowSoftInputMode="adjustNothing" />
+
+        <activity android:name=".BooksInCategoryActivity"/>
 
         <service
             android:name=".firebase.MyFirebaseMessagingService"
@@ -40,8 +59,5 @@
             </intent-filter>
         </service>
     </application>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

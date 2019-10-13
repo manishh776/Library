@@ -152,7 +152,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
              BookPackage oldBook = gson.fromJson(old.toString(), BookPackage.class);
              BookPackage newBook = gson.fromJson(newjson.toString(), BookPackage.class);
              from = gson.fromJson(fromUser.toString(), User.class);
-             message = "I want to replace set of my " + oldBook.getBookArrayList().size() + " books "+ " with your set of " + newBook.getBookArrayList().size() + " books.";
+             message = "I want to replace set of my " + oldBook.getBookArrayList().size() + " books "+ " with your set of " +
+                     newBook.getBookArrayList().size() +
+                     " books." + "\n Mobile - " + from.getPhone() +
+                     "\n Address - " + from.getAddress();
 
              intent = new Intent(this, RequestActivity.class);
         }else if(TYPE.equals(Config.SALE)){
@@ -163,7 +166,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             BookPackage oldBook = gson.fromJson(old.toString(), BookPackage.class);
             from = gson.fromJson(fromUser.toString(), User.class);
             message = "Your set of " + oldBook.getBookArrayList().size() + " books has been bought by" +
-                    " " +  from.getName() + ". Please contact admin for your payment.";
+                    " " +  from.getName()
+                    + "\n Mobile - " + from.getPhone() +
+                    "\n Address - " + from.getAddress()
+                    + ". Please contact admin for your payment after delivering the book to this user.";
 
         }else if(TYPE.equals(Config.COMPLAINT_REPLY)){
             Complaint complaint = gson.fromJson(message, Complaint.class);

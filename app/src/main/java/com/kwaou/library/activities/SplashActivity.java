@@ -49,13 +49,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         phoneemail = findViewById(R.id.phoneemail);
         password = findViewById(R.id.password);
         buttonLogin = findViewById(R.id.loginBtn);
-
-        int login_state = Integer.parseInt(KeyValueDb.get(this, Config.LOGIN_STATE,"0"));
-        if(login_state == 1){
-            content.setVisibility(View.INVISIBLE);
-            gotoMainActivity();
-        }
-
         buttonLogin.setOnClickListener(this);
 
 
@@ -112,13 +105,10 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
                 }
                 progressDialog.dismiss();
                 Toast.makeText(SplashActivity.this, "invalid details", Toast.LENGTH_SHORT).show();
-
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }
@@ -137,7 +127,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         FirebaseDatabase.getInstance().getReference(Config.FIREBASE_USERS).child(user.getId()).child("token").setValue(token);
 
         gotoMainActivity();
-
     }
 
     private boolean valid() {

@@ -65,10 +65,6 @@ public class AddBookActivity extends AppCompatActivity implements View.OnClickLi
     private boolean firstBook = false;
     private Category category;
     private String userid = null, imageUrl;
-    private Spinner spinnerCategories;
-    private ArrayList<String> stringList;
-    private ArrayList<Category> categoryArrayList;
-    private int CATEGORY_SELECTED = 0;
     private int  exchanged = 0;
     boolean cannotSell = false;
 
@@ -90,60 +86,10 @@ public class AddBookActivity extends AppCompatActivity implements View.OnClickLi
 
 
         initViews();
-
-        if (firstBook) {
-            exchange.setVisibility(View.GONE);
-            sell.setVisibility(View.GONE);
-            spinnerCategories.setVisibility(View.GONE);
-        }else {
-            stringList = new ArrayList<>();
-            categoryArrayList = new ArrayList<>();
-            fetchCategories();
-
-        }
-
         handleRadiobuttons();
-
+        fetchData();
     }
 
-    private void fetchCategories() {
-        progressDialog.show();
-
-        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference(Config.FIREBASE_CATEGORIES);
-        categoryRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds: dataSnapshot.getChildren()){
-                    Category category = ds.getValue(Category.class);
-                    if(category!=null) {
-                        stringList.add(category.getName());
-                        categoryArrayList.add(category);
-                    }
-                }
-                ArrayAdapter<String> deptAdapter = new ArrayAdapter<String>(AddBookActivity.this, android.R.layout.simple_spinner_item, stringList);
-                deptAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerCategories.setAdapter(deptAdapter);
-
-                spinnerCategories.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        CATEGORY_SELECTED = i;
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
-
-                    }
-                });
-                fetchData();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
 
     private void fetchData() {
         //pending is bookdeals in which user has requested to exchange
@@ -218,19 +164,15 @@ public class AddBookActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void initViews() {
-        spinnerCategories = findViewById(R.id.categories);
         back = findViewById(R.id.back);
         pic = findViewById(R.id.pic);
         title = findViewById(R.id.title);
         desc = findViewById(R.id.desc);
         price = findViewById(R.id.price);
-
         exchange = findViewById(R.id.radioexchange);
         sell = findViewById(R.id.radioSell);
-
         selectPdf = findViewById(R.id.Btnpickpdf);
         saveBtn = findViewById(R.id.saveBtn);
-
         selectPdf.setOnClickListener(this);
         pic.setOnClickListener(this);
         back.setOnClickListener(this);
@@ -266,19 +208,20 @@ public class AddBookActivity extends AppCompatActivity implements View.OnClickLi
             cost = Integer.parseInt(price.getText().toString());
         }
         if(category == null)
-            category = categoryArrayList.get(CATEGORY_SELECTED);
+            category = (Category) getIntent().getSerializableExtra("category");
 
         if(userid == null || userid.isEmpty()){
             userid = KeyValueDb.get(this, Config.USERID,"");
             Log.d(TAG, userid);
         }
-
+        int CATEGORY_SELECTED = getIntent().getIntExtra("category_selected", 0);
         updateBookCountInCategory(category);
 
         Book book = new Book(id, pdfUrl, userid, name, description, imageUrl, category, cost);
         booksRef.child(id).setValue(book);
         Intent intent = new Intent();
         intent.putExtra("book", book);
+        intent.putExtra("category_selected", CATEGORY_SELECTED);
         setResult(RESULT_OK, intent);
         Toast.makeText(this, "book added", Toast.LENGTH_SHORT).show();
         finish();
@@ -307,15 +250,10 @@ public class AddBookActivity extends AppCompatActivity implements View.OnClickLi
             price.setError("Can't be empty");
         }
 
-        if(!bookUploaded){
-            allokay = false;
-            Toast.makeText(this, "please upload pdf", Toast.LENGTH_SHORT).show();
-        }
         if(!image_selected){
             allokay = false;
             Toast.makeText(this, "please select image", Toast.LENGTH_SHORT).show();
         }
-
         return allokay;
     }
 
@@ -333,7 +271,7 @@ public class AddBookActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // TODO Auto-generated method stub
+        super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case PICKPDF_RESULT_CODE:
                 if (resultCode == RESULT_OK) {

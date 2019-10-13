@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.Key;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,11 +32,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.kwaou.library.BooksInCategoryActivity;
 import com.kwaou.library.BooksInPackageActivity;
 import com.kwaou.library.activities.AllMyBooksActivity;
 import com.kwaou.library.R;
 import com.kwaou.library.activities.MainActivity;
 import com.kwaou.library.activities.RequestActivity;
+import com.kwaou.library.activities.SplashActivity;
 import com.kwaou.library.helper.Config;
 import com.kwaou.library.models.Admin;
 import com.kwaou.library.models.Book;
@@ -93,8 +96,10 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
                 viewHolder.linearLayoutPrice.setVisibility(View.VISIBLE);
                 viewHolder.price.setText(book.getPrice()+"");
             }
-            viewHolder.noofbooks.setText(book.getBookArrayList().size() + "");
-        Glide.with(context).load(book.getBookArrayList().get(0).getPicUrl()).diskCacheStrategy(DiskCacheStrategy.RESOURCE).into(viewHolder.image);
+            if(!book.getBookArrayList().isEmpty()) {
+                viewHolder.noofbooks.setText(book.getBookArrayList().size() + "");
+                Glide.with(context).load(book.getBookArrayList().get(0).getPicUrl()).diskCacheStrategy(DiskCacheStrategy.RESOURCE).into(viewHolder.image);
+            }
     }
 
     @Override
@@ -144,13 +149,25 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
 
                     case R.id.item_buy:
                     case R.id.item_exchange:
-                        initiateExchange(position);
+                        handleExchange(position);
                         break;
                 }
                 return true;
             }
         });
         popup.show();//showing popup menu
+    }
+
+    private void handleExchange(int position) {
+        final int login_state = Integer.parseInt(KeyValueDb.get(context, Config.LOGIN_STATE, "0"));
+        if(login_state == 1)
+            initiateExchange(position);
+        else
+            startRegisterActivity();
+    }
+
+    private void startRegisterActivity() {
+        context.startActivity(new Intent(context, SplashActivity.class));
     }
 
     private void displayBookList(int position) {
@@ -163,7 +180,7 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
     public void initiateExchange(int position){
         BookPackage book = bookPackageArrayList.get(position);
         Log.d(TAG, "Clicked");
-        if(context instanceof MainActivity) {
+        if(context instanceof BooksInCategoryActivity) {
             if (book.getPrice() == 0)
                 startPickABookActivity(book);
             else{
@@ -184,7 +201,6 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
     private void showPaymentDialog(final BookPackage book) {
         final Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.payment_dialog_layout);
-
         PaymentCardView paymentCardView = dialog.findViewById(R.id.paycardview);
         paymentCardView.setOnPaymentCardEventListener(new PaymentCardView.OnPaymentCardEventListener() {
             @Override
@@ -218,7 +234,6 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
                 User user = dataSnapshot.getValue(User.class);
                 if(user!=null){
                     markPackageSold(book, user);
-                    sendPush(book, user.getToken());
                     notifyAdmin(book);
                 }else{
                     Log.e(TAG,"user is null");
@@ -260,8 +275,6 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
         Map<String, Object> map = new HashMap<>();
         map.put("old", book);
         map.put("from", requester);
-
-
         String booktxt = gson.toJson(map);
         Log.d(TAG, booktxt);
         String type = Config.SALE;
@@ -290,13 +303,12 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
         DatabaseReference books = FirebaseDatabase.getInstance().getReference(Config.FIREBASE_BOOKPACKAGES);
         books.child(book.getId()).child("status").setValue(2);
 
-
         String userstr = KeyValueDb.get(context, Config.USER,"");
         Gson gson = new Gson();
         User receiver = gson.fromJson(userstr, User.class);
         DatabaseReference bookDealsRef = FirebaseDatabase.getInstance().getReference(Config.FIREBASE_BOOK_DEALS);
         String id = bookDealsRef.push().getKey();
-        BookDeal deal = new BookDeal(id, book,null, user,  receiver, true,0, getCurrentDate());
+        BookDeal deal = new BookDeal(id, book,null, user,  receiver, true,3, getCurrentDate());
         bookDealsRef.child(id).setValue(deal);
     }
 

@@ -6,7 +6,7 @@ public class BookDeal {
     private boolean forSale;
     private BookPackage old, newbook;
     private User lender, receiver;
-    private int status;// 1-requested 2-accepted 0-rejected
+    private int status;// 1-requested 2-accepted 0-rejected 3-paid for a book 4-marked received
     private String date;
 
     public BookDeal(){
