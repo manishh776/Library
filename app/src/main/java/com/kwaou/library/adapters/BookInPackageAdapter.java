@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -74,7 +75,10 @@ public class BookInPackageAdapter extends RecyclerView.Adapter<BookInPackageAdap
                 @Override
                 public void onClick(View view) {
                     Book book = bookArrayList.get(getAdapterPosition());
+                    if(!book.getUrl().isEmpty())
                     openPdfByUrl(book.getUrl());
+                    else
+                        Toast.makeText(context, "No pdf is available for this book", Toast.LENGTH_SHORT).show();
                 }
             });
         }
