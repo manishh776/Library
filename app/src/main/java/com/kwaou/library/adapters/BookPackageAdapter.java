@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -125,11 +126,45 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
             pop_up_menu.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    int position = getAdapterPosition();
-                    displayMenu(position, pop_up_menu);
+                    int pos = getAdapterPosition();
+                    showBookPackageAlertDialog(pos);
                 }
             });
         }
+    }
+
+    private void showBookPackageAlertDialog(final int pos) {
+        BookPackage bookPackage = bookPackageArrayList.get(pos);
+        final Dialog dialog = new Dialog(context);
+        dialog.setContentView(R.layout.book_package_alert_dialog);
+
+        TextView packageDesc = dialog.findViewById(R.id.packageDesc);
+        final Button buttonShowBooks = dialog.findViewById(R.id.showBook);
+        final Button buttonExchange = dialog.findViewById(R.id.exchangeBook);
+        final Button buttonBuy = dialog.findViewById(R.id.buyBook);
+        packageDesc.setText(bookPackage.getBookArrayList().get(0).getDesc());
+        if(bookPackage.getPrice() == 0)
+            buttonBuy.setVisibility(View.GONE);
+        else
+            buttonExchange.setVisibility(View.GONE);
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(view == buttonShowBooks){
+                    displayBookList(pos);
+                } else if (view == buttonBuy || view == buttonExchange) {
+                    handleExchange(pos);
+                }
+                dialog.dismiss();
+            }
+        };
+
+        buttonShowBooks.setOnClickListener(listener);
+        buttonExchange.setOnClickListener(listener);
+        buttonBuy.setOnClickListener(listener);
+
+        dialog.show();
     }
 
     private void displayMenu(final int position, ImageView popupimage) {
@@ -149,7 +184,6 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
 
                     case R.id.item_buy:
                     case R.id.item_exchange:
-                        handleExchange(position);
                         break;
                 }
                 return true;
@@ -227,14 +261,13 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
     private void notifyOwner(final BookPackage book) {
         progressDialog.show();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference(Config.FIREBASE_USERS);
-
         userRef.child(book.getUserid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
                 if(user!=null){
                     markPackageSold(book, user);
-                    notifyAdmin(book);
+                    sendPushToOwner(book, user);
                 }else{
                     Log.e(TAG,"user is null");
                 }
@@ -247,8 +280,39 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
         });
     }
 
-    private void notifyAdmin(final BookPackage book) {
+    private void sendPushToOwner(final BookPackage book, User user) {
         progressDialog.show();
+        String type = Config.SALE;
+        Gson gson = new Gson();
+        String userstr = KeyValueDb.get(context, Config.USER,"");
+        final User requester = gson.fromJson(userstr, User.class);
+        Map<String, Object> map = new HashMap<>();
+        map.put("old", book);
+        map.put("from", requester);
+        String booktxt = gson.toJson(map);
+        RetrofitClient.getInstance().getApi().sendPush(user.getToken(), booktxt , type)
+                .enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                        try {
+                            JSONObject obj = new JSONObject(response.body().string());
+                            Log.d(TAG, response.body().string());
+                            notifyAdmin(book);
+                        } catch (JSONException | IOException e) {
+                            e.printStackTrace();
+                        }
+                        progressDialog.dismiss();
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                    }
+                });
+    }
+
+    private void notifyAdmin(final BookPackage book) {
         DatabaseReference adminRef = FirebaseDatabase.getInstance().getReference(Config.FIREBASE_ADMIN);
         adminRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -294,7 +358,6 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
-
                     }
                 });
     }

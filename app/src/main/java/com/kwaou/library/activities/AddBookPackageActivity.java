@@ -7,10 +7,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -43,6 +45,7 @@ public class AddBookPackageActivity extends AppCompatActivity implements View.On
     private ProgressDialog progressDialog;
     private ArrayList<String> stringList;
     private int CATEGORY_SELECTED = 0;
+    private EditText packageName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,7 @@ public class AddBookPackageActivity extends AppCompatActivity implements View.On
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Please Wait...");
         progressDialog.setCancelable(false);
+        packageName = findViewById(R.id.packageName);
 
         fetchCategories();
     }
@@ -81,7 +85,10 @@ public class AddBookPackageActivity extends AppCompatActivity implements View.On
             if(count == 0){
                 Toast.makeText(this, "Please add at least one book in the package", Toast.LENGTH_SHORT).show();
             }else{
+                if(!TextUtils.isEmpty(packageName.getText()))
                 saveBookPackage();
+                else
+                    packageName.setError("Can't be empty");
             }
         }else if(view == back){
             finish();
@@ -89,10 +96,11 @@ public class AddBookPackageActivity extends AppCompatActivity implements View.On
     }
 
     private void saveBookPackage() {
+        String setName = packageName.getText().toString();
         String userid = KeyValueDb.get(this, Config.USERID,"");
         DatabaseReference packageRef = FirebaseDatabase.getInstance().getReference(Config.FIREBASE_BOOKPACKAGES);
         String id = packageRef.push().getKey();
-        BookPackage bookPackage = new BookPackage(id, userid, bookArrayList, price, 0, categoryArrayList.get(CATEGORY_SELECTED));
+        BookPackage bookPackage = new BookPackage(setName, id, userid, bookArrayList, price, 0, categoryArrayList.get(CATEGORY_SELECTED));
         packageRef.child(id).setValue(bookPackage);
         Toast.makeText(this, "book package added", Toast.LENGTH_SHORT).show();
         finish();

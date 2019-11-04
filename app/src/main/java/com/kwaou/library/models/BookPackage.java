@@ -8,21 +8,25 @@ public class BookPackage implements Serializable {
     private String id, userid;
     private ArrayList<Book> bookArrayList;
     private int price;
+    private String packageName;
     private Category category;
     private  int status = 0; // 0 available 1 exchanged 2 sold
 
     public BookPackage(){
-
     }
 
-
-    public BookPackage(String id, String userid, ArrayList<Book> bookArrayList, int price, int status, Category category) {
+    public BookPackage(String packageName, String id, String userid, ArrayList<Book> bookArrayList, int price, int status, Category category) {
         this.id = id;
         this.bookArrayList = bookArrayList;
         this.userid = userid;
         this.price = price;
         this.status = status;
         this.category = category;
+        this.packageName = packageName;
+    }
+
+    public String getPackageName() {
+        return packageName;
     }
 
     public Category getCategory() {

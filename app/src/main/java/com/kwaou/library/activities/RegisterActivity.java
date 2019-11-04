@@ -274,7 +274,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private void addBookPackage(String userid) {
         DatabaseReference packageRef = FirebaseDatabase.getInstance().getReference(Config.FIREBASE_BOOKPACKAGES);
         String id = packageRef.push().getKey();
-        BookPackage bookPackage = new BookPackage(id, userid, bookArrayList, price, 0, categoryArrayList.get(CATEGORY_SELECTED));
+        BookPackage bookPackage = new BookPackage("",id, userid, bookArrayList, price, 0, categoryArrayList.get(CATEGORY_SELECTED));
         packageRef.child(id).setValue(bookPackage);
     }
 

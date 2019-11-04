@@ -64,6 +64,14 @@
             android:layout_marginTop="100dp"
             >
 
+            <EditText
+                android:id="@+id/packageName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Book Package name"
+                android:layout_marginBottom="20dp"
+                />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

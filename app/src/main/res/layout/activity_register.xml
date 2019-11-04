@@ -262,6 +262,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_alignParentEnd="true"
+                android:gravity="center_horizontal"
                 >
 
                 <TextView
