@@ -13,14 +13,110 @@
         android:textStyle="bold"
         />
 
-    <TextView
-        android:id="@+id/packageDesc"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Manish"
-        android:textSize="18sp"
-        android:layout_marginTop="10dp"
-        />
+        android:orientation="horizontal"
+        >
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Package Name- "
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"
+            />
+
+        <TextView
+            android:id="@+id/packageName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Manish"
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Package Details- "
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"
+            />
+
+        <TextView
+            android:id="@+id/packageDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Manish"
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Owner Phone- "
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"
+            />
+
+        <TextView
+            android:id="@+id/phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Owner Address- "
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"
+            />
+
+        <TextView
+            android:id="@+id/address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"
+            />
+
+    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="350dp"

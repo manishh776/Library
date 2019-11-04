@@ -101,6 +101,7 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
                 viewHolder.noofbooks.setText(book.getBookArrayList().size() + "");
                 Glide.with(context).load(book.getBookArrayList().get(0).getPicUrl()).diskCacheStrategy(DiskCacheStrategy.RESOURCE).into(viewHolder.image);
             }
+            viewHolder.packageName.setText(book.getPackageName());
     }
 
     @Override
@@ -111,7 +112,7 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView image, pop_up_menu;
-        TextView price, noofbooks;
+        TextView price, noofbooks, packageName;
         LinearLayout linearLayoutPrice;
 
         public ViewHolder(@NonNull View itemView) {
@@ -122,6 +123,7 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
             noofbooks = itemView.findViewById(R.id.noofbooks);
             pop_up_menu = itemView.findViewById(R.id.pop_up_menu);
             linearLayoutPrice = itemView.findViewById(R.id.priceLinear);
+            packageName = itemView.findViewById(R.id.packageName);
 
             pop_up_menu.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -138,10 +140,32 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
         final Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.book_package_alert_dialog);
 
+        final TextView ownerPhone, ownerAddress;
         TextView packageDesc = dialog.findViewById(R.id.packageDesc);
+        ownerPhone = dialog.findViewById(R.id.phone);
+        ownerAddress = dialog.findViewById(R.id.address);
         final Button buttonShowBooks = dialog.findViewById(R.id.showBook);
         final Button buttonExchange = dialog.findViewById(R.id.exchangeBook);
         final Button buttonBuy = dialog.findViewById(R.id.buyBook);
+
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference(Config.FIREBASE_USERS);
+        userRef.child(bookPackage.getUserid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if(user!=null){
+                    ownerPhone.setText(user.getPhone());
+                    ownerAddress.setText(user.getAddress());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         packageDesc.setText(bookPackage.getBookArrayList().get(0).getDesc());
         if(bookPackage.getPrice() == 0)
             buttonBuy.setVisibility(View.GONE);
@@ -167,30 +191,6 @@ public class BookPackageAdapter extends RecyclerView.Adapter<BookPackageAdapter.
         dialog.show();
     }
 
-    private void displayMenu(final int position, ImageView popupimage) {
-        //Creating the instance of PopupMenu
-        BookPackage bookPackage = bookPackageArrayList.get(position);
-        PopupMenu popup = new PopupMenu(context, popupimage);
-        //Inflating the Popup using xml file
-        int menu = bookPackage.getPrice() == 0 ? R.menu.book_package_pop_menu : R.menu.book_package_pop_menu_with_buy;
-        popup.getMenuInflater().inflate(menu, popup.getMenu());
-        //registering popup with OnMenuItemClickListener
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.item_book_list:
-                        displayBookList(position);
-                        break;
-
-                    case R.id.item_buy:
-                    case R.id.item_exchange:
-                        break;
-                }
-                return true;
-            }
-        });
-        popup.show();//showing popup menu
-    }
 
     private void handleExchange(int position) {
         final int login_state = Integer.parseInt(KeyValueDb.get(context, Config.LOGIN_STATE, "0"));
