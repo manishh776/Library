@@ -12,8 +12,6 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import android.util.Log;
-
-
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -113,10 +111,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     break;
 
             }
-
-
             showNotification(title, message);
-
         }
         catch (Exception e) {
             Log.e("Exception",e.getMessage());

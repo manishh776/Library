@@ -3,55 +3,22 @@ package com.kwaou.library.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.crashlytics.android.Crashlytics;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
 import com.kwaou.library.R;
-import com.kwaou.library.adapters.BookAdapter;
-import com.kwaou.library.fragments.BooksFragment;
 import com.kwaou.library.fragments.CategoryFragment;
 import com.kwaou.library.fragments.NotificationFragment;
 import com.kwaou.library.fragments.ProfileFragment;
 import com.kwaou.library.helper.Config;
 import com.kwaou.library.helper.NonSwipingViewPager;
-import com.kwaou.library.models.BookDeal;
-import com.kwaou.library.models.BookPackage;
-import com.kwaou.library.models.User;
-import com.kwaou.library.retrofit.RetrofitClient;
 import com.kwaou.library.sqlite.KeyValueDb;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 

@@ -59,9 +59,7 @@ public class BooksFragment extends Fragment {
         progressDialog.setCancelable(false);
 
         fetchBooks();
-
         setUpSearch();
-
     }
 
     private void setUpSearch() {

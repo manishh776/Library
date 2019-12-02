@@ -50,8 +50,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
         password = findViewById(R.id.password);
         buttonLogin = findViewById(R.id.loginBtn);
         buttonLogin.setOnClickListener(this);
-
-
     }
 
     private void gotoMainActivity() {
@@ -119,9 +117,11 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
 
         Gson gson = new Gson();
+        String token = KeyValueDb.get(this, Config.USER_TOKEN,"");
+        user.setToken(token);
         String userStr = gson.toJson(user);
         KeyValueDb.set(this, Config.USER, userStr,1);
-        String token = KeyValueDb.get(this, Config.USER_TOKEN,"");
+
 
         //update token
         FirebaseDatabase.getInstance().getReference(Config.FIREBASE_USERS).child(user.getId()).child("token").setValue(token);
